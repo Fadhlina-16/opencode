@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule — Cornel Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    /* ============================================================
+       TOKENS
+       ============================================================ */
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-bg: #162418;
+      --sidebar-active: #38516F;
+      --sidebar-text: #F2F2F2;
+      --sidebar-muted: rgba(242,242,242,.5);
+      --header-h: 80px;
+      --header-border: #E2E6ED;
+      --accent: #F97316;
+      --accent-hover: #EA6C0A;
+      --accent-light: #FFF7ED;
+      --page-bg: #F3F4F6;
+      --card-bg: #FFFFFF;
+      --border: #E5E7EB;
+      --text: #1F2A44;
+      --text-body: #6B7280;
+      --text-muted: #9CA3AF;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --lecture-bg: #DBEAFE;  --lecture-text: #1D4ED8;  --lecture-dot: #3B82F6;
+      --quiz-bg: #EDE9FE;     --quiz-text: #6D28D9;     --quiz-dot: #8B5CF6;
+      --assign-bg: #D1FAE5;   --assign-text: #065F46;   --assign-dot: #10B981;
+      --live-bg: #FFF7ED;     --live-text: #C2410C;     --live-dot: #F97316;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Epilogue', sans-serif; background: var(--page-bg); color: var(--text); display: flex; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ============================================================
+       SIDEBAR
+       ============================================================ */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 200;
+      border-radius: 0 20px 20px 0;
+      transition: transform .28s ease;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      display: flex; align-items: center; justify-content: center;
+      padding: 28px 20px 18px; flex-shrink: 0;
+    }
+    .sidebar-logo img {
+      width: 108px; height: 108px;
+      object-fit: contain; border-radius: 50%;
+    }
+    .logo-fallback {
+      display: none; flex-direction: column; align-items: center;
+      gap: 3px; text-align: center;
+    }
+    .logo-fallback span { font-size: .88rem; font-weight: 800; color: #fff; line-height: 1.3; }
+    .logo-fallback small { font-size: .65rem; color: var(--sidebar-muted); }
+
+    .sidebar-nav {
+      padding: 8px 12px 20px;
+      flex: 1; display: flex; flex-direction: column; gap: 2px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 11px 10px; border-radius: 10px;
+      color: var(--sidebar-text); font-size: .92rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .nav-icon { width: 20px; height: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .nav-icon svg { width: 100%; height: 100%; }
+    .nav-item:hover  { background: rgba(255,255,255,.07); }
+    .nav-item.active { background: var(--sidebar-active); }
+    .nav-item.logout { margin-top: auto; color: #F87171; }
+    .nav-item.logout:hover { background: rgba(248,113,113,.1); }
+    .nav-spacer { flex: 1; min-height: 16px; }
+
+    /* ============================================================
+       MAIN
+       ============================================================ */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .site-header {
+      height: var(--header-h);
+      background: #fff;
+      border-bottom: 1px solid var(--header-border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .breadcrumbs { display: flex; align-items: center; gap: 7px; font-size: .8rem; }
+    .bc-link { color: var(--text-muted); }
+    .bc-link:hover { color: var(--accent); }
+    .bc-sep { color: #D1D5DB; }
+    .bc-current { color: var(--text); font-weight: 600; }
+    .header-right { display: flex; align-items: center; gap: 26px; }
+
+    .notif-btn {
+      position: relative; width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: none; cursor: pointer; color: var(--text-body);
+      border-radius: var(--radius); transition: background .15s;
+    }
+    .notif-btn:hover { background: var(--page-bg); }
+    .notif-btn svg { width: 24px; height: 24px; }
+    .notif-dot {
+      position: absolute; top: 3px; right: 3px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--accent); border: 2px solid #fff;
+    }
+
+    .user-chip { display: flex; align-items: center; cursor: pointer; }
+    .user-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      object-fit: cover; flex-shrink: 0;
+    }
+    .user-avatar-init {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--sidebar-active); color: #fff;
+      font-size: .86rem; font-weight: 700;
+      display: none; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .user-info { padding: 0 10px; }
+    .user-name { font-size: .88rem; font-weight: 600; color: #000; }
+    .user-year { font-size: .78rem; color: #D9D9D9; }
+
+    .hamburger {
+      display: none; background: none; border: none;
+      cursor: pointer; padding: 4px; color: var(--text);
+    }
+    .hamburger svg { width: 22px; height: 22px; }
+
+    /* ============================================================
+       PAGE BODY
+       ============================================================ */
+    .page-body { padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+
+    /* Error banner */
+    .error-banner {
+      display: none; align-items: center; gap: 12px;
+      padding: 13px 18px; background: #FEF2F2;
+      border: 1px solid #FECACA; border-radius: var(--radius-lg);
+      font-size: .82rem; color: #991B1B;
+    }
+    .error-banner.show { display: flex; }
+    .error-banner svg { width: 18px; height: 18px; flex-shrink: 0; stroke: #DC2626; }
+    .error-msg { flex: 1; font-weight: 500; }
+    .retry-btn {
+      background: #fff; border: 1px solid #FECACA; border-radius: 4px;
+      color: #DC2626; font-size: .75rem; font-weight: 600;
+      padding: 5px 12px; cursor: pointer; font-family: inherit; white-space: nowrap;
+    }
+    .retry-btn:hover { background: #FEE2E2; }
+
+    /* Page header */
+    .page-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .page-title { font-size: 1.35rem; font-weight: 700; letter-spacing: -.01em; }
+    .page-subtitle { font-size: .8rem; color: var(--text-muted); margin-top: 3px; }
+
+    .legend-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 4px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: var(--text-body); font-weight: 500; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+    /* ============================================================
+       CALENDAR CARD — full width
+       ============================================================ */
+    .cal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .cal-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cal-month-label { font-size: 1.05rem; font-weight: 700; color: var(--text); letter-spacing: -.01em; }
+    .cal-nav-btns { display: flex; gap: 6px; align-items: center; }
+    .cal-btn {
+      height: 34px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-body); font-family: inherit; font-size: .78rem; font-weight: 600;
+      transition: border-color .15s, color .15s, background .15s;
+      padding: 0 12px; white-space: nowrap;
+    }
+    .cal-btn.icon-only { width: 34px; padding: 0; }
+    .cal-btn svg { width: 14px; height: 14px; }
+    .cal-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    /* Grid */
+    .cal-grid { padding: 0 20px 20px; }
+
+    .day-names { display: grid; grid-template-columns: repeat(7, 1fr); }
+    .day-name {
+      text-align: center; font-size: .7rem; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: .07em;
+      padding: 16px 0 10px;
+    }
+
+    .cal-cells { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+    .cal-cell {
+      display: flex; flex-direction: column;
+      padding: 10px 10px 8px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .12s;
+      min-height: 100px;
+      border: 1.5px solid transparent;
+      position: relative;
+    }
+    .cal-cell:not(.filler):hover { background: #F9FAFB; }
+    .cal-cell.filler { cursor: default; opacity: .3; pointer-events: none; }
+
+    /* Today circle */
+    .cal-cell.is-today .date-num {
+      background: var(--accent); color: #fff;
+      border-radius: 50%; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* Selected */
+    .cal-cell.is-selected {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+    .cal-cell.is-selected:hover { background: var(--accent-light); }
+    .cal-cell.is-selected .date-num { color: var(--accent); font-weight: 700; }
+    .cal-cell.is-today.is-selected .date-num { background: var(--accent); color: #fff; }
+
+    /* Has events — subtle left border accent */
+    .cal-cell.has-events { border-left: 3px solid transparent; }
+
+    .date-num {
+      font-size: .84rem; font-weight: 600; color: var(--text);
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Event pills inside cell */
+    .cell-events {
+      display: flex; flex-direction: column; gap: 3px; margin-top: 6px;
+    }
+    .cell-pill {
+      font-size: .65rem; font-weight: 600;
+      padding: 2px 7px; border-radius: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .cell-pill.lecture    { background: var(--lecture-bg);  color: var(--lecture-text); }
+    .cell-pill.quiz       { background: var(--quiz-bg);     color: var(--quiz-text); }
+    .cell-pill.assignment { background: var(--assign-bg);   color: var(--assign-text); }
+    .cell-pill.live       { background: var(--live-bg);     color: var(--live-text); }
+
+    .cell-more {
+      font-size: .62rem; font-weight: 600; color: var(--text-muted);
+      margin-top: 2px; padding-left: 2px;
+    }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    .modal-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 500;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--card-bg);
+      border-radius: 16px;
+      width: 100%; max-width: 520px;
+      max-height: 85vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      animation: modalIn .2s cubic-bezier(.34,1.2,.64,1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(16px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .modal-date-wrap {}
+    .modal-date { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .modal-count {
+      font-size: .72rem; font-weight: 500;
+      color: var(--text-muted); margin-top: 2px;
+    }
+    .modal-close {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: none; cursor: pointer; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, color .15s; flex-shrink: 0;
+    }
+    .modal-close:hover { background: var(--page-bg); color: var(--text); }
+    .modal-close svg { width: 16px; height: 16px; }
+
+    .modal-body {
+      overflow-y: auto; flex: 1; padding: 8px 0;
+    }
+
+    /* Empty state in modal */
+    .modal-empty {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 44px 24px;
+      text-align: center; gap: 8px;
+    }
+    .modal-empty-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: #EFF6FF;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 6px;
+    }
+    .modal-empty-title { font-size: .9rem; font-weight: 600; color: var(--text); }
+    .modal-empty-sub   { font-size: .78rem; color: var(--text-muted); line-height: 1.5; max-width: 200px; }
+
+    /* Activity row */
+    .activity-item {
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .12s;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item:hover { background: #FAFBFD; }
+    .activity-item.expanded { background: #FAFBFD; }
+
+    .act-row1 {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 10px; margin-bottom: 6px;
+    }
+    .act-title { font-size: .86rem; font-weight: 600; color: var(--text); line-height: 1.35; }
+
+    .type-badge {
+      font-size: .62rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: .04em;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .tb-lecture    { background: var(--lecture-bg);  color: var(--lecture-text); }
+    .tb-quiz       { background: var(--quiz-bg);     color: var(--quiz-text); }
+    .tb-assignment { background: var(--assign-bg);   color: var(--assign-text); }
+    .tb-live       { background: var(--live-bg);     color: var(--live-text); }
+
+    .act-row2 { display: flex; align-items: center; justify-content: space-between; }
+    .act-time {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .74rem; color: var(--text-muted); font-weight: 500;
+    }
+    .act-time svg { width: 12px; height: 12px; }
+
+    .chevron {
+      width: 16px; height: 16px; color: var(--text-muted);
+      transition: transform .2s; flex-shrink: 0;
+    }
+    .activity-item.expanded .chevron { transform: rotate(180deg); }
+
+    /* Expandable detail */
+    .act-detail {
+      display: none; flex-direction: column; gap: 10px;
+      padding: 14px 0 4px;
+      border-top: 1px solid var(--border); margin-top: 10px;
+      animation: fadeSlide .15s ease;
+    }
+    .activity-item.expanded .act-detail { display: flex; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .detail-field { display: flex; align-items: baseline; gap: 8px; font-size: .8rem; }
+    .df-label { min-width: 82px; color: var(--text-muted); font-weight: 500; flex-shrink: 0; }
+    .df-value { color: var(--text); font-weight: 500; }
+    .df-link  { color: var(--accent); font-weight: 600; cursor: pointer; }
+    .df-link:hover { text-decoration: underline; }
+
+    .go-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 18px;
+      background: var(--sidebar-bg); color: #fff;
+      border: none; border-radius: var(--radius);
+      font-size: .8rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: opacity .15s; margin-top: 4px; align-self: flex-start;
+    }
+    .go-btn:hover { opacity: .85; }
+    .go-btn svg { width: 13px; height: 13px; }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--sidebar-bg); color: #fff;
+      padding: 12px 20px; border-radius: var(--radius-lg);
+      font-size: .82rem; font-weight: 500; z-index: 9999;
+      box-shadow: 0 6px 24px rgba(0,0,0,.22);
+      display: flex; align-items: center; gap: 10px; max-width: 320px;
+      animation: fadeSlide .2s ease;
+    }
+    .toast-bar {
+      position: absolute; bottom: 0; left: 0; height: 3px;
+      background: var(--accent);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      animation: shrink 2.5s linear forwards;
+    }
+    @keyframes shrink { from { width: 100%; } to { width: 0; } }
+
+    /* ============================================================
+       SIDEBAR OVERLAY
+       ============================================================ */
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 150;
+    }
+    .sidebar-overlay.show { display: block; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 960px) {
+      .cal-cell { min-height: 80px; }
+      .cell-pill { display: none; }
+      /* show dots instead on small screens */
+      .cell-dots-sm { display: flex !important; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .hamburger { display: block; }
+      .site-header { padding: 0 16px; }
+      .page-body { padding: 16px; gap: 16px; }
+      .cal-card-header { padding: 16px 16px 14px; }
+      .cal-grid { padding: 0 10px 14px; }
+      .cal-cell { min-height: 60px; padding: 6px 4px; }
+      .date-num { width: 24px; height: 24px; font-size: .76rem; }
+    }
+    @media (max-width: 480px) {
+      .page-title { font-size: 1.1rem; }
+      .cal-cell { min-height: 50px; }
+      .legend-row { gap: 10px; }
+      .user-info { display: none; }
+      .modal { max-width: 100%; border-radius: 16px 16px 0 0; align-self: flex-end; max-height: 90vh; }
+      .modal-backdrop { align-items: flex-end; padding: 0; }
+    }
+
+    /* Small-screen dot indicators (hidden by default, shown via JS on small viewports) */
+    .cell-dots-sm {
+      display: none; gap: 3px; margin-top: 5px; flex-wrap: wrap;
+    }
+    .cell-dot { width: 6px; height: 6px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img
+      src="https://www.figma.com/api/mcp/asset/be12936b-8bf0-43c7-a3cf-8a033d7b8845"
+      alt="Cornel Leadership Academy"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+    />
+    <div class="logo-fallback" style="display:none">
+      <span>Cornel Leadership Academy</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></span>
+      Dashboard
+    </a>
+
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg></span>
+      E-Learning
+    </a>
+
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
+      Mentoring Programme
+    </a>
+
+    <a href="#" class="nav-item" id="nav-courses">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
+      My Courses
+    </a>
+
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+      Sessions
+    </a>
+
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>
+      Attendance
+    </a>
+
+    <a href="#" class="nav-item active">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+      Schedule
+    </a>
+
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>
+      Result
+    </a>
+
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+      Announcements
+    </a>
+
+    <a href="#" class="nav-item">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg></span>
+      Settings
+    </a>
+
+    <div class="nav-spacer"></div>
+
+    <a href="#" class="nav-item logout">
+      <span class="nav-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+      Logout
+    </a>
+
+  </nav>
+</aside>
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+<main class="main">
+
+  <header class="site-header">
+    <div class="header-left">
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <nav class="breadcrumbs">
+        <a href="#" class="bc-link">Home</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Schedule</span>
+      </nav>
+    </div>
+    <div class="header-right">
+      <button class="notif-btn" aria-label="Notifications">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 002 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="user-chip">
+        <img class="user-avatar"
+          src="https://www.figma.com/api/mcp/asset/c6944ae7-d6e9-4db6-bdb1-99523e9f672f"
+          alt="John Doe"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+        />
+        <div class="user-avatar-init">JD</div>
+        <div class="user-info">
+          <div class="user-name">John Doe</div>
+          <div class="user-year">3rd Year</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+    <!-- Error banner (press E to toggle) -->
+    <div class="error-banner" id="error-banner" role="alert">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="error-msg">Unable to load schedule. Please check your connection and try again.</span>
+      <button class="retry-btn" id="btn-retry">Retry</button>
+    </div>
+
+    <!-- Header row -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">My Schedule</h1>
+        <p class="page-subtitle">View your upcoming classes, quizzes, and assignments</p>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--lecture-dot)"></span>Lecture</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--quiz-dot)"></span>Quiz</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--assign-dot)"></span>Assignment</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--live-dot)"></span>Live Session</div>
+      </div>
+    </div>
+
+    <!-- Full-width calendar -->
+    <div class="cal-card">
+      <div class="cal-card-header">
+        <span class="cal-month-label" id="month-label"></span>
+        <div class="cal-nav-btns">
+          <button class="cal-btn icon-only" id="btn-prev">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          <button class="cal-btn" id="btn-today">Today</button>
+          <button class="cal-btn icon-only" id="btn-next">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="cal-grid">
+        <div class="day-names">
+          <div class="day-name">Sun</div><div class="day-name">Mon</div>
+          <div class="day-name">Tue</div><div class="day-name">Wed</div>
+          <div class="day-name">Thu</div><div class="day-name">Fri</div>
+          <div class="day-name">Sat</div>
+        </div>
+        <div class="cal-cells" id="cal-cells"></div>
+      </div>
+    </div>
+
+  </div><!-- /.page-body -->
+</main>
+
+<!-- ============================================================
+     MODAL
+     ============================================================ -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-date">
+    <div class="modal-header">
+      <div class="modal-date-wrap">
+        <div class="modal-date" id="modal-date">—</div>
+        <div class="modal-count" id="modal-count">—</div>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Close">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const TODAY  = new Date(2026, 3, 15); // fixed: 15 April 2026
+
+/* ── Schedule data ─────────────────────────────────────────────── */
+const SCHEDULE = {
+  '2026-4-1': [
+    { id:1,  title:'Introduction to Hospitality Management', module:'Module 1', instructor:'Dr. Sarah Chen',  time:'9:00 – 10:30 AM',     type:'lecture' },
+    { id:2,  title:'Customer Service Fundamentals Quiz',     module:'Module 1', instructor:'Dr. Sarah Chen',  time:'2:00 – 3:00 PM',      type:'quiz' },
+  ],
+  '2026-4-3': [
+    { id:3,  title:'Food & Beverage Operations',             module:'Module 2', instructor:'Prof. James Lim', time:'10:00 – 11:30 AM',    type:'lecture' },
+  ],
+  '2026-4-7': [
+    { id:4,  title:'Assignment: Customer Journey Mapping',   module:'Module 1', instructor:'Dr. Sarah Chen',  time:'Due 11:59 PM',         type:'assignment' },
+  ],
+  '2026-4-8': [
+    { id:5,  title:'Live Q&A: Hospitality Trends 2026',      module:'Module 2', instructor:'Prof. James Lim', time:'4:00 – 5:00 PM',      type:'live' },
+    { id:6,  title:'Room Division Management',               module:'Module 3', instructor:'Ms. Priya Nair',  time:'6:00 – 7:30 PM',      type:'lecture' },
+  ],
+  '2026-4-10': [
+    { id:7,  title:'F&B Operations Mid-Term Quiz',           module:'Module 2', instructor:'Prof. James Lim', time:'9:00 – 10:00 AM',     type:'quiz' },
+  ],
+  '2026-4-14': [
+    { id:8,  title:'Event Planning & Management',            module:'Module 3', instructor:'Ms. Priya Nair',  time:'10:00 AM – 12:00 PM', type:'lecture' },
+    { id:9,  title:'Assignment: Event Proposal',             module:'Module 3', instructor:'Ms. Priya Nair',  time:'Due 11:59 PM',         type:'assignment' },
+  ],
+  '2026-4-15': [
+    { id:10, title:'Front Office Procedures',                module:'Module 4', instructor:'Dr. Sarah Chen',  time:'9:00 – 10:30 AM',     type:'lecture' },
+    { id:11, title:'Live Workshop: Role Play Scenarios',     module:'Module 4', instructor:'Dr. Sarah Chen',  time:'2:00 – 4:00 PM',      type:'live' },
+  ],
+  '2026-4-17': [
+    { id:12, title:'Housekeeping Standards & Practices',     module:'Module 4', instructor:'Ms. Priya Nair',  time:'11:00 AM – 12:30 PM', type:'lecture' },
+  ],
+  '2026-4-20': [],
+  '2026-4-21': [
+    { id:13, title:'Revenue Management Fundamentals',        module:'Module 5', instructor:'Prof. James Lim', time:'9:00 – 10:30 AM',     type:'lecture' },
+    { id:14, title:'Quiz: Pricing Strategies',               module:'Module 5', instructor:'Prof. James Lim', time:'3:00 – 4:00 PM',      type:'quiz' },
+  ],
+  '2026-4-22': [
+    { id:15, title:'Assignment: Yield Management Report',    module:'Module 5', instructor:'Prof. James Lim', time:'Due 11:59 PM',         type:'assignment' },
+  ],
+  '2026-4-24': [
+    { id:16, title:'Live Guest Lecture: Industry Expert',    module:'Module 5', instructor:'Guest Speaker',   time:'5:00 – 6:30 PM',      type:'live' },
+  ],
+  '2026-4-28': [
+    { id:17, title:'Hospitality Technology & PMS',           module:'Module 6', instructor:'Dr. Sarah Chen',  time:'9:00 – 10:30 AM',     type:'lecture' },
+  ],
+  '2026-4-29': [
+    { id:18, title:'Final Module Assessment',                module:'Module 6', instructor:'Dr. Sarah Chen',  time:'10:00 AM – 12:00 PM', type:'quiz' },
+    { id:19, title:'Assignment: Digital Tools Portfolio',    module:'Module 6', instructor:'Dr. Sarah Chen',  time:'Due 11:59 PM',         type:'assignment' },
+  ],
+};
+
+/* ── State ─────────────────────────────────────────────────────── */
+let viewYear = TODAY.getFullYear(), viewMonth = TODAY.getMonth();
+
+/* ── Helpers ────────────────────────────────────────────────────── */
+const $  = id => document.getElementById(id);
+const dk = (y,m1,d) => `${y}-${m1}-${d}`;
+const TYPE_CLS   = { lecture:'lecture', quiz:'quiz', assignment:'assignment', live:'live' };
+const TYPE_BADGE = { lecture:'tb-lecture', quiz:'tb-quiz', assignment:'tb-assignment', live:'tb-live' };
+const TYPE_LABEL = { lecture:'Lecture', quiz:'Quiz', assignment:'Assignment', live:'Live Session' };
+const TYPE_DOT   = { lecture:'var(--lecture-dot)', quiz:'var(--quiz-dot)', assignment:'var(--assign-dot)', live:'var(--live-dot)' };
+const isSmall    = () => window.innerWidth < 960;
+
+function fullDate(y,m0,d) { return `${DAYS[new Date(y,m0,d).getDay()]}, ${d} ${MONTHS[m0]} ${y}`; }
+
+/* ── Render calendar ────────────────────────────────────────────── */
+function renderCal() {
+  $('month-label').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+  const cells     = $('cal-cells');
+  cells.innerHTML = '';
+  const first     = new Date(viewYear, viewMonth, 1).getDay();
+  const total     = new Date(viewYear, viewMonth+1, 0).getDate();
+  const prevTotal = new Date(viewYear, viewMonth, 0).getDate();
+
+  for (let i = first-1; i >= 0; i--) cells.appendChild(makeCell(prevTotal-i, true));
+  for (let d = 1; d <= total; d++) {
+    const key   = dk(viewYear, viewMonth+1, d);
+    const today = d===TODAY.getDate() && viewMonth===TODAY.getMonth() && viewYear===TODAY.getFullYear();
+    cells.appendChild(makeCell(d, false, today, key, SCHEDULE[key]));
+  }
+  const filled = first + total;
+  const rem    = filled%7===0 ? 0 : 7-(filled%7);
+  for (let d = 1; d <= rem; d++) cells.appendChild(makeCell(d, true));
+}
+
+function makeCell(day, filler, isToday=false, key=null, acts=undefined) {
+  const el = document.createElement('div');
+  el.className = 'cal-cell' + (filler?' filler':'') + (isToday?' is-today':'');
+  if (!filler && acts && acts.length > 0) el.classList.add('has-events');
+
+  // Date number
+  const num = document.createElement('div');
+  num.className = 'date-num';
+  num.textContent = day;
+  el.appendChild(num);
+
+  if (!filler && acts !== undefined) {
+    if (isSmall()) {
+      // Dots on small screens
+      if (acts.length > 0) {
+        const dots = document.createElement('div');
+        dots.className = 'cell-dots-sm';
+        dots.style.display = 'flex';
+        const seen = new Set();
+        acts.forEach(a => {
+          if (seen.size >= 3) return;
+          if (!seen.has(a.type)) {
+            seen.add(a.type);
+            const dot = document.createElement('span');
+            dot.className = 'cell-dot';
+            dot.style.background = TYPE_DOT[a.type];
+            dots.appendChild(dot);
+          }
+        });
+        el.appendChild(dots);
+      }
+    } else {
+      // Event pills on wider screens
+      if (acts.length > 0) {
+        const list = document.createElement('div');
+        list.className = 'cell-events';
+        const max = 3;
+        acts.slice(0, max).forEach(a => {
+          const pill = document.createElement('div');
+          pill.className = `cell-pill ${TYPE_CLS[a.type]}`;
+          pill.textContent = a.title;
+          list.appendChild(pill);
+        });
+        if (acts.length > max) {
+          const more = document.createElement('div');
+          more.className = 'cell-more';
+          more.textContent = `+${acts.length - max} more`;
+          list.appendChild(more);
+        }
+        el.appendChild(list);
+      }
+    }
+
+    // Click → open modal
+    if (key) el.addEventListener('click', () => openModal(key));
+  }
+
+  return el;
+}
+
+/* ── Modal ──────────────────────────────────────────────────────── */
+function openModal(key) {
+  const [y,m1,d] = key.split('-').map(Number);
+  const acts = SCHEDULE[key];
+  const backdrop = $('modal-backdrop');
+
+  $('modal-date').textContent  = fullDate(y, m1-1, d);
+  $('modal-count').textContent = !acts || acts.length === 0
+    ? 'No scheduled activities'
+    : acts.length === 1 ? '1 activity scheduled' : `${acts.length} activities scheduled`;
+
+  const body = $('modal-body');
+  body.innerHTML = '';
+
+  if (!acts || acts.length === 0) {
+    body.innerHTML = `
+      <div class="modal-empty">
+        <div class="modal-empty-icon">
+          <svg fill="none" stroke="#3B82F6" stroke-width="1.8" viewBox="0 0 24 24" width="24" height="24">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/>
+          </svg>
+        </div>
+        <p class="modal-empty-title">No scheduled activities</p>
+        <p class="modal-empty-sub">There are no classes, quizzes, or assignments on this date.</p>
+      </div>`;
+  } else {
+    acts.forEach(a => {
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.innerHTML = `
+        <div class="act-row1">
+          <span class="act-title">${a.title}</span>
+          <span class="type-badge ${TYPE_BADGE[a.type]}">${TYPE_LABEL[a.type]}</span>
+        </div>
+        <div class="act-row2">
+          <span class="act-time">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            ${a.time}
+          </span>
+          <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+        </div>
+        <div class="act-detail">
+          <div class="detail-field">
+            <span class="df-label">Module</span>
+            <span class="df-value df-link" data-mod="${a.module}">${a.module}</span>
+          </div>
+          <div class="detail-field">
+            <span class="df-label">Instructor</span>
+            <span class="df-value">${a.instructor}</span>
+          </div>
+          <div class="detail-field">
+            <span class="df-label">Date &amp; Time</span>
+            <span class="df-value">${fullDate(y, m1-1, d)}, ${a.time}</span>
+          </div>
+          <button class="go-btn" data-mod="${a.module}">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+            Go to ${a.module}
+          </button>
+        </div>`;
+
+      // Toggle expand
+      item.addEventListener('click', e => {
+        if (e.target.closest('.df-link,.go-btn')) return;
+        const was = item.classList.contains('expanded');
+        body.querySelectorAll('.activity-item.expanded').forEach(el => el.classList.remove('expanded'));
+        if (!was) item.classList.add('expanded');
+      });
+
+      // Module link / go button
+      item.querySelectorAll('.df-link,.go-btn').forEach(el => {
+        el.addEventListener('click', ev => {
+          ev.stopPropagation();
+          goToCourse(el.dataset.mod);
+        });
+      });
+
+      body.appendChild(item);
+    });
+  }
+
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  $('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+$('modal-close').addEventListener('click', closeModal);
+$('modal-backdrop').addEventListener('click', e => { if (e.target === $('modal-backdrop')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ── Navigate to My Courses ─────────────────────────────────────── */
+function goToCourse(mod) {
+  closeModal();
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  $('nav-courses').classList.add('active');
+  showToast(`Opening ${mod} in My Courses…`);
+}
+
+/* ── Toast ───────────────────────────────────────────────────────── */
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16" style="flex-shrink:0"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>${msg}</span><div class="toast-bar"></div>`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.cssText += 'opacity:0;transition:opacity .3s'; setTimeout(() => t.remove(), 300); }, 2500);
+}
+
+/* ── Navigation buttons ─────────────────────────────────────────── */
+$('btn-prev').addEventListener('click', () => { if(--viewMonth < 0){viewMonth=11;viewYear--;} renderCal(); });
+$('btn-next').addEventListener('click', () => { if(++viewMonth > 11){viewMonth=0;viewYear++;} renderCal(); });
+$('btn-today').addEventListener('click', () => { viewYear=TODAY.getFullYear(); viewMonth=TODAY.getMonth(); renderCal(); });
+
+/* ── Error banner (press E to demo) ─────────────────────────────── */
+$('btn-retry').addEventListener('click', () => { $('error-banner').classList.remove('show'); showToast('Retrying…'); });
+document.addEventListener('keydown', e => {
+  if ((e.key==='e'||e.key==='E') && !e.target.matches('input,textarea')) $('error-banner').classList.toggle('show');
+});
+
+/* ── Hamburger ───────────────────────────────────────────────────── */
+$('hamburger').addEventListener('click', () => { $('sidebar').classList.toggle('open'); $('overlay').classList.toggle('show'); });
+$('overlay').addEventListener('click', () => { $('sidebar').classList.remove('open'); $('overlay').classList.remove('show'); });
+
+/* ── Init ────────────────────────────────────────────────────────── */
+renderCal();
+</script>
+</body>
+</html>
