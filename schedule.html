@@ -617,14 +617,14 @@
     <!-- Header row -->
     <div class="page-header">
       <div>
-        <h1 class="page-title">My Schedule</h1>
-        <p class="page-subtitle">View your upcoming classes, quizzes, and assignments</p>
+        <h1 class="page-title">My Mentoring</h1>
+        <p class="page-subtitle">View your 1:1 sessions, group mentoring, and reviews</p>
       </div>
       <div class="legend-row">
-        <div class="legend-item"><span class="legend-dot" style="background:var(--lecture-dot)"></span>Lecture</div>
-        <div class="legend-item"><span class="legend-dot" style="background:var(--quiz-dot)"></span>Quiz</div>
-        <div class="legend-item"><span class="legend-dot" style="background:var(--assign-dot)"></span>Assignment</div>
-        <div class="legend-item"><span class="legend-dot" style="background:var(--live-dot)"></span>Live Session</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--lecture-dot)"></span>1:1 Mentoring</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--quiz-dot)"></span>Group Mentoring</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--assign-dot)"></span>Progress Review</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--live-dot)"></span>Office Hours</div>
       </div>
     </div>
 
@@ -685,50 +685,50 @@ const TODAY  = new Date(2026, 3, 15); // fixed: 15 April 2026
 /* ── Schedule data ─────────────────────────────────────────────── */
 const SCHEDULE = {
   '2026-4-1': [
-    { id:1,  title:'Introduction to Hospitality Management', module:'Module 1', instructor:'Dr. Sarah Chen',  time:'9:00 – 10:30 AM',     type:'lecture' },
-    { id:2,  title:'Customer Service Fundamentals Quiz',     module:'Module 1', instructor:'Dr. Sarah Chen',  time:'2:00 – 3:00 PM',      type:'quiz' },
+    { id:1,  title:'1:1 Mentoring — Sarah Johnson',      mentee:'Sarah Johnson',    focus:'Career Development',       time:'9:00 – 10:00 AM',     type:'mentoring' },
+    { id:2,  title:'Group Mentoring — Junior Cohort',     mentee:'Junior Cohort (4)', focus:'Leadership Fundamentals', time:'2:00 – 3:30 PM',      type:'group' },
   ],
   '2026-4-3': [
-    { id:3,  title:'Food & Beverage Operations',             module:'Module 2', instructor:'Prof. James Lim', time:'10:00 – 11:30 AM',    type:'lecture' },
+    { id:3,  title:'Progress Review — Emily Rodriguez',   mentee:'Emily Rodriguez',  focus:'Academic Progress',        time:'10:00 – 11:00 AM',    type:'review' },
   ],
   '2026-4-7': [
-    { id:4,  title:'Assignment: Customer Journey Mapping',   module:'Module 1', instructor:'Dr. Sarah Chen',  time:'Due 11:59 PM',         type:'assignment' },
+    { id:4,  title:'Mentee Check-in — David Kim',         mentee:'David Kim',        focus:'Personal Development Plan', time:'Due 11:59 PM',        type:'review' },
   ],
   '2026-4-8': [
-    { id:5,  title:'Live Q&A: Hospitality Trends 2026',      module:'Module 2', instructor:'Prof. James Lim', time:'4:00 – 5:00 PM',      type:'live' },
-    { id:6,  title:'Room Division Management',               module:'Module 3', instructor:'Ms. Priya Nair',  time:'6:00 – 7:30 PM',      type:'lecture' },
+    { id:5,  title:'Office Hours — Open Slot',            mentee:'All mentees',      focus:'Q&A / Drop-in',            time:'4:00 – 5:00 PM',      type:'office' },
+    { id:6,  title:'1:1 Mentoring — Michael Chen',        mentee:'Michael Chen',     focus:'Technical Skills Roadmap',  time:'6:00 – 7:00 PM',      type:'mentoring' },
   ],
   '2026-4-10': [
-    { id:7,  title:'F&B Operations Mid-Term Quiz',           module:'Module 2', instructor:'Prof. James Lim', time:'9:00 – 10:00 AM',     type:'quiz' },
+    { id:7,  title:'Group Mentoring — Senior Cohort',     mentee:'Senior Cohort (3)', focus:'Industry Readiness',       time:'9:00 – 10:30 AM',     type:'group' },
   ],
   '2026-4-14': [
-    { id:8,  title:'Event Planning & Management',            module:'Module 3', instructor:'Ms. Priya Nair',  time:'10:00 AM – 12:00 PM', type:'lecture' },
-    { id:9,  title:'Assignment: Event Proposal',             module:'Module 3', instructor:'Ms. Priya Nair',  time:'Due 11:59 PM',         type:'assignment' },
+    { id:8,  title:'1:1 Mentoring — Aisha Patel',         mentee:'Aisha Patel',      focus:'Communication Skills',     time:'10:00 – 11:00 AM',    type:'mentoring' },
+    { id:9,  title:'Progress Review — James Wilson',      mentee:'James Wilson',     focus:'Semester Progress',        time:'Due 11:59 PM',        type:'review' },
   ],
   '2026-4-15': [
-    { id:10, title:'Front Office Procedures',                module:'Module 4', instructor:'Dr. Sarah Chen',  time:'9:00 – 10:30 AM',     type:'lecture' },
-    { id:11, title:'Live Workshop: Role Play Scenarios',     module:'Module 4', instructor:'Dr. Sarah Chen',  time:'2:00 – 4:00 PM',      type:'live' },
+    { id:10, title:'1:1 Mentoring — Sarah Johnson',       mentee:'Sarah Johnson',    focus:'Internship Preparation',   time:'9:00 – 10:00 AM',     type:'mentoring' },
+    { id:11, title:'Office Hours — Open Slot',            mentee:'All mentees',      focus:'Drop-in Session',          time:'2:00 – 4:00 PM',      type:'office' },
   ],
   '2026-4-17': [
-    { id:12, title:'Housekeeping Standards & Practices',     module:'Module 4', instructor:'Ms. Priya Nair',  time:'11:00 AM – 12:30 PM', type:'lecture' },
+    { id:12, title:'Group Mentoring — All Cohorts',       mentee:'All mentees',      focus:'Peer Learning Workshop',   time:'11:00 AM – 12:30 PM', type:'group' },
   ],
   '2026-4-20': [],
   '2026-4-21': [
-    { id:13, title:'Revenue Management Fundamentals',        module:'Module 5', instructor:'Prof. James Lim', time:'9:00 – 10:30 AM',     type:'lecture' },
-    { id:14, title:'Quiz: Pricing Strategies',               module:'Module 5', instructor:'Prof. James Lim', time:'3:00 – 4:00 PM',      type:'quiz' },
+    { id:13, title:'1:1 Mentoring — Emily Rodriguez',     mentee:'Emily Rodriguez',  focus:'Research Project Guidance', time:'9:00 – 10:00 AM',     type:'mentoring' },
+    { id:14, title:'Mentee Check-in — David Kim',         mentee:'David Kim',        focus:'Wellness & Balance',       time:'3:00 – 4:00 PM',      type:'review' },
   ],
   '2026-4-22': [
-    { id:15, title:'Assignment: Yield Management Report',    module:'Module 5', instructor:'Prof. James Lim', time:'Due 11:59 PM',         type:'assignment' },
+    { id:15, title:'Progress Review — Michael Chen',      mentee:'Michael Chen',     focus:'Goal Assessment',          time:'Due 11:59 PM',        type:'review' },
   ],
   '2026-4-24': [
-    { id:16, title:'Live Guest Lecture: Industry Expert',    module:'Module 5', instructor:'Guest Speaker',   time:'5:00 – 6:30 PM',      type:'live' },
+    { id:16, title:'Guest Mentor Session — Industry Panel', mentee:'All mentees',    focus:'Career Pathways',          time:'5:00 – 6:30 PM',      type:'office' },
   ],
   '2026-4-28': [
-    { id:17, title:'Hospitality Technology & PMS',           module:'Module 6', instructor:'Dr. Sarah Chen',  time:'9:00 – 10:30 AM',     type:'lecture' },
+    { id:17, title:'1:1 Mentoring — Aisha Patel',         mentee:'Aisha Patel',      focus:'Presentation Skills',      time:'9:00 – 10:00 AM',     type:'mentoring' },
   ],
   '2026-4-29': [
-    { id:18, title:'Final Module Assessment',                module:'Module 6', instructor:'Dr. Sarah Chen',  time:'10:00 AM – 12:00 PM', type:'quiz' },
-    { id:19, title:'Assignment: Digital Tools Portfolio',    module:'Module 6', instructor:'Dr. Sarah Chen',  time:'Due 11:59 PM',         type:'assignment' },
+    { id:18, title:'Group Mentoring — Final Review',      mentee:'All cohorts',      focus:'End-of-Year Reflection',   time:'10:00 AM – 12:00 PM', type:'group' },
+    { id:19, title:'Progress Review — Sarah Johnson',     mentee:'Sarah Johnson',    focus:'Portfolio Submission',     time:'Due 11:59 PM',        type:'review' },
   ],
 };
 
@@ -738,10 +738,10 @@ let viewYear = TODAY.getFullYear(), viewMonth = TODAY.getMonth();
 /* ── Helpers ────────────────────────────────────────────────────── */
 const $  = id => document.getElementById(id);
 const dk = (y,m1,d) => `${y}-${m1}-${d}`;
-const TYPE_CLS   = { lecture:'lecture', quiz:'quiz', assignment:'assignment', live:'live' };
-const TYPE_BADGE = { lecture:'tb-lecture', quiz:'tb-quiz', assignment:'tb-assignment', live:'tb-live' };
-const TYPE_LABEL = { lecture:'Lecture', quiz:'Quiz', assignment:'Assignment', live:'Live Session' };
-const TYPE_DOT   = { lecture:'var(--lecture-dot)', quiz:'var(--quiz-dot)', assignment:'var(--assign-dot)', live:'var(--live-dot)' };
+const TYPE_CLS   = { mentoring:'lecture', group:'quiz', review:'assignment', office:'live' };
+const TYPE_BADGE = { mentoring:'tb-lecture', group:'tb-quiz', review:'tb-assignment', office:'tb-live' };
+const TYPE_LABEL = { mentoring:'1:1 Mentoring', group:'Group Mentoring', review:'Progress Review', office:'Office Hours' };
+const TYPE_DOT   = { mentoring:'var(--lecture-dot)', group:'var(--quiz-dot)', review:'var(--assign-dot)', office:'var(--live-dot)' };
 const isSmall    = () => window.innerWidth < 960;
 
 function fullDate(y,m0,d) { return `${DAYS[new Date(y,m0,d).getDay()]}, ${d} ${MONTHS[m0]} ${y}`; }
@@ -852,7 +852,7 @@ function openModal(key) {
           </svg>
         </div>
         <p class="modal-empty-title">No scheduled activities</p>
-        <p class="modal-empty-sub">There are no classes, quizzes, or assignments on this date.</p>
+        <p class="modal-empty-sub">There are no mentoring sessions or reviews on this date.</p>
       </div>`;
   } else {
     acts.forEach(a => {
@@ -872,20 +872,20 @@ function openModal(key) {
         </div>
         <div class="act-detail">
           <div class="detail-field">
-            <span class="df-label">Module</span>
-            <span class="df-value df-link" data-mod="${a.module}">${a.module}</span>
+            <span class="df-label">Mentee</span>
+            <span class="df-value df-link" data-mentee="${a.mentee}">${a.mentee}</span>
           </div>
           <div class="detail-field">
-            <span class="df-label">Instructor</span>
-            <span class="df-value">${a.instructor}</span>
+            <span class="df-label">Focus Area</span>
+            <span class="df-value">${a.focus}</span>
           </div>
           <div class="detail-field">
             <span class="df-label">Date &amp; Time</span>
             <span class="df-value">${fullDate(y, m1-1, d)}, ${a.time}</span>
           </div>
-          <button class="go-btn" data-mod="${a.module}">
+          <button class="go-btn" data-mentee="${a.mentee}">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-            Go to ${a.module}
+            View ${a.mentee}
           </button>
         </div>`;
 
@@ -901,7 +901,7 @@ function openModal(key) {
       item.querySelectorAll('.df-link,.go-btn').forEach(el => {
         el.addEventListener('click', ev => {
           ev.stopPropagation();
-          goToCourse(el.dataset.mod);
+          viewMentee(el.dataset.mentee);
         });
       });
 
@@ -922,12 +922,10 @@ $('modal-close').addEventListener('click', closeModal);
 $('modal-backdrop').addEventListener('click', e => { if (e.target === $('modal-backdrop')) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-/* ── Navigate to My Courses ─────────────────────────────────────── */
-function goToCourse(mod) {
+/* ── Navigate to Mentee Profile ──────────────────────────────────── */
+function viewMentee(name) {
   closeModal();
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  $('nav-courses').classList.add('active');
-  showToast(`Opening ${mod} in My Courses…`);
+  showToast(`Opening profile for ${name}…`);
 }
 
 /* ── Toast ───────────────────────────────────────────────────────── */

@@ -21,6 +21,28 @@ export default {
           DEFAULT: '#1e293b',
           hover: '#0f172a',
         },
+        subtle: '#f1f5f9',
+        skeleton: '#e2e8f0',
+        error: {
+          bg: '#fef2f2',
+          text: '#dc2626',
+        },
+        'type-lecture': {
+          bg: '#dbeafe',
+          text: '#1d4ed8',
+        },
+        'type-quiz': {
+          bg: '#fef3c7',
+          text: '#b45309',
+        },
+        'type-assignment': {
+          bg: '#dcfce7',
+          text: '#15803d',
+        },
+        'type-session': {
+          bg: '#f3e8ff',
+          text: '#7e22ce',
+        },
       },
     },
   },
