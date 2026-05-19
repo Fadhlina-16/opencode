@@ -282,6 +282,50 @@
       margin-top: 2px; padding-left: 2px;
     }
 
+    /* Loading skeleton */
+    .cal-skeleton { display: none; }
+    .cal-skeleton.show { display: block; }
+    .sk-cells {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    }
+    .sk-cell {
+      aspect-ratio: 1;
+      border-radius: var(--radius);
+      background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+      background-size: 200% 100%;
+      animation: sk-shimmer 1.4s ease-in-out infinite;
+    }
+    @keyframes sk-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Empty calendar state */
+    .cal-empty {
+      display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 60px 20px; text-align: center;
+    }
+    .cal-empty.show { display: flex; }
+    .cal-empty-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .cal-empty-icon svg { width: 28px; height: 28px; stroke: var(--accent); }
+    .cal-empty-title {
+      font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: 4px;
+    }
+    .cal-empty-desc {
+      font-size: .8rem; color: var(--text-muted); max-width: 280px; line-height: 1.5;
+    }
+    .cal-cells.hidden { display: none; }
+
+    @media (max-width: 768px) {
+      .cal-empty { padding: 40px 16px; }
+    }
+
     /* ============================================================
        MODAL
        ============================================================ */
@@ -649,7 +693,19 @@
           <div class="day-name">Thu</div><div class="day-name">Fri</div>
           <div class="day-name">Sat</div>
         </div>
+        <div class="cal-skeleton" id="cal-skeleton"></div>
         <div class="cal-cells" id="cal-cells"></div>
+        <div class="cal-empty" id="cal-empty">
+          <div class="cal-empty-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h3 class="cal-empty-title">No activities this month</h3>
+          <p class="cal-empty-desc">There are no mentoring sessions scheduled. Try another month or check back later.</p>
+        </div>
       </div>
     </div>
 
@@ -746,11 +802,31 @@ const isSmall    = () => window.innerWidth < 960;
 
 function fullDate(y,m0,d) { return `${DAYS[new Date(y,m0,d).getDay()]}, ${d} ${MONTHS[m0]} ${y}`; }
 
+function monthHasEvents() {
+  const total = new Date(viewYear, viewMonth+1, 0).getDate();
+  for (let d = 1; d <= total; d++) {
+    const key = dk(viewYear, viewMonth+1, d);
+    const acts = SCHEDULE[key];
+    if (acts && acts.length > 0) return true;
+  }
+  return false;
+}
+
+function showSkeleton() {
+  const sk = $('cal-skeleton');
+  sk.innerHTML = '<div class="sk-cells">' + Array(35).fill('<div class="sk-cell"></div>').join('') + '</div>';
+  sk.classList.add('show');
+}
+
 /* ── Render calendar ────────────────────────────────────────────── */
 function renderCal() {
+  $('cal-skeleton').classList.remove('show');
+  $('cal-empty').classList.remove('show');
+
   $('month-label').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
   const cells     = $('cal-cells');
   cells.innerHTML = '';
+  cells.classList.remove('hidden');
   const first     = new Date(viewYear, viewMonth, 1).getDay();
   const total     = new Date(viewYear, viewMonth+1, 0).getDate();
   const prevTotal = new Date(viewYear, viewMonth, 0).getDate();
@@ -764,6 +840,11 @@ function renderCal() {
   const filled = first + total;
   const rem    = filled%7===0 ? 0 : 7-(filled%7);
   for (let d = 1; d <= rem; d++) cells.appendChild(makeCell(d, true));
+
+  if (!monthHasEvents()) {
+    cells.classList.add('hidden');
+    $('cal-empty').classList.add('show');
+  }
 }
 
 function makeCell(day, filler, isToday=false, key=null, acts=undefined) {
@@ -953,7 +1034,9 @@ $('hamburger').addEventListener('click', () => { $('sidebar').classList.toggle('
 $('overlay').addEventListener('click', () => { $('sidebar').classList.remove('open'); $('overlay').classList.remove('show'); });
 
 /* ── Init ────────────────────────────────────────────────────────── */
-renderCal();
+$('cal-cells').classList.add('hidden');
+showSkeleton();
+setTimeout(renderCal, 500);
 </script>
 </body>
 </html>

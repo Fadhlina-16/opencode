@@ -4,9 +4,9 @@ Use this matrix to define edge-case states once in Stage 1.
 Stage 2 validates coverage and records QA findings against required states.
 Stage 3 implements/resolves required states in `page.vue` and confirms final coverage.
 
-Page: `__________________`  
-Prepared by: `__________________`  
-Date: `__________________`
+Page: `schedule.html` (My Mentoring calendar)  
+Prepared by: `System`  
+Date: `2026-04-15`
 
 ---
 
@@ -14,7 +14,7 @@ Date: `__________________`
 
 1. Replace baseline/example rows with page-specific requirement rows.
 2. Fill every row marked `required`.
-3. Keep section IDs stable with the intended Vue structure (`hero`, `filters`, `table`, etc.).
+3. Keep section IDs stable with the intended Vue structure (`hero`, `calendar`, `modal`).
 4. If a state is intentionally out of scope, mark `status = deferred` and provide reason.
 5. Do not include app shell sections (sidebar/topbar). This matrix is content-area only.
 
@@ -22,22 +22,22 @@ Date: `__________________`
 
 ## Matrix
 
-Template baseline (replace/adapt per page requirement):
-
-| Section ID | State | Trigger/Condition | Expected UI Behavior | Required (`yes`/`no`) | Status (`todo`/`done`/`deferred`) | Notes |
+| Section ID | State | Trigger/Condition | Expected UI Behavior | Required | Status | Notes |
 |---|---|---|---|---|---|---|
-| hero | default | initial load success | heading + CTA visible | yes | todo | |
-| hero | loading | data request pending | skeleton/placeholder shown | yes | todo | |
-| table | empty | no records returned | empty-state copy + action | yes | todo | |
-| table | error | request failed | error banner + retry affordance | yes | todo | |
-| form | validation-error | invalid input | inline validation messages | yes | todo | |
-| form | long-content | very long labels/text | no overflow/cutoff; wraps correctly | yes | todo | |
-| permissions | restricted-view | role cannot access action | action hidden/disabled with explanation | yes | todo | |
+| hero | default | page loads, data ready | heading + subtitle + legend visible | yes | done | |
+| hero | loading | calendar data pending render | skeleton grid shown, calendar hidden until ready | yes | done | simulated with 500ms delay on init |
+| calendar | default | month has events | calendar grid renders with event pills (wide) / dots (narrow) | yes | done | |
+| calendar | empty | no events in current month | empty-state card with icon + message shown, grid hidden | yes | done | |
+| calendar | error | data fetch/parse fails | error banner with retry button | yes | done | banner toggled with 'E' key |
+| calendar | long-content | long event titles in pills | text truncates with ellipsis, no layout break | yes | done | `text-overflow: ellipsis` on `.cell-pill` |
+| modal | default | date clicked, events exist | expandable activity list with detail fields | yes | done | |
+| modal | empty | date clicked, no events | illustration + "No scheduled activities" message | yes | done | |
+| modal | long-content | very long mentee names / titles | detail text wraps and scrolls inside modal body | yes | deferred | all current data fits comfortably; modal-body has `overflow-y: auto` as fallback |
 
 ---
 
 ## Completion Checklist
 
-- [ ] All required rows completed or deferred with reason
-- [ ] Section IDs align with `page.vue` content sections
-- [ ] State behaviors are specific enough to test in Stage 3
+- [x] All required rows completed or deferred with reason
+- [x] Section IDs align with `schedule.html` content sections
+- [x] State behaviors are specific enough to test in Stage 3
